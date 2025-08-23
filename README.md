@@ -12,18 +12,29 @@
 
 ```
 WifiGuard/
-├─ pom.xml                        # parent (modules: server, client)
-├─ server/
-│  ├─ pom.xml
-│  └─ src/main/{java,resources}
-│     ├─ com/wifiguard/server/
-│     │  ├─ ServerMain.java, DeviceMonitor.java, Allowlist.java, ClientHandler.java
-│     │  ├─ SecurityConfig.java, TcpServer.java, TlsServer.java
-│     │  └─ gateway/{RouterGateway.java, WindowsArpGateway.java, ...}
-│     └─ resources/{server.properties, allowlist.txt}
-└─ client/
-   ├─ pom.xml
-   └─ src/main/java/com/wifiguard/client/ClientMain.java
+├─ client/src/main/java/com/wifiguard/client/
+│   └─ ClientMain.java
+├─ server/src/main/java/com/wifiguard/server/
+│   ├─ ServerMain.java
+│   ├─ DeviceMonitor.java
+│   ├─ Allowlist.java
+│   ├─ ClientHandler.java
+│   ├─ SecurityConfig.java
+│   ├─ TcpServer.java
+│   ├─ TlsServer.java
+│   ├─ gateway/
+│   │   ├─ RouterGateway.java
+│   │   ├─ WindowsArpGateway.java
+│   │   ├─ DummyRouterGateway.java
+│   │   └─ OpenWrtRouterGateway.java
+│   └─ notify/
+│       └─ ConsoleNotifier.java
+├─ server/src/main/resources/
+│   ├─ allowlist.txt
+│   └─ server.properties
+├─ pom.xml
+└─ README.md
+
 ```
 
 ---
