@@ -9,6 +9,6 @@ public class TlsServer {
   }
   public void start() throws Exception {
     System.out.println("[TLS] WiFiGuard server listening on port " + port);
-    while (true) { Socket s = ss.accept(); new Thread(new ClientHandler(s, allow, monitor)).start(); }
+    while (true) { Socket s = ss.accept(); new Thread(new ClientHandler(s, allow, monitor, null)).start(); }
   }
 }
