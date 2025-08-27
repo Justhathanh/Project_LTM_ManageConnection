@@ -1,0 +1,4 @@
+# WifiGuard Allowlist - Format: MAC,HOSTNAME,IP
+# Generated: 2025-08-26T01:46:00.491242900
+
+00:1B:44:01:02:03,TestDevice,192.168.1.100
