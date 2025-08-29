@@ -21,7 +21,6 @@ public class ServerMain {
     private final Allowlist allowlist;
     private final DeviceMonitor deviceMonitor;
     private final TcpServer tcpServer;
-    private final WifiGuardHttpServer httpServer;
     
     // Performance metrics
     private final AtomicInteger activeConnections;
@@ -52,8 +51,7 @@ public class ServerMain {
             this.tcpServer = new TcpServer(config, allowlist, deviceMonitor, this);
             logger.info("TcpServer đã được khởi tạo");
             
-            this.httpServer = new WifiGuardHttpServer(deviceMonitor, allowlist);
-            logger.info("HTTP Server đã được khởi tạo");
+
             
             // Initialize metrics
             this.activeConnections = new AtomicInteger(0);
@@ -268,8 +266,7 @@ public class ServerMain {
             tcpServer.start();
             logger.info("TCP server started");
             
-            httpServer.start();
-            logger.info("HTTP server started");
+
             
             logger.info("All components started successfully");
         } catch (Exception e) {
@@ -321,10 +318,6 @@ public class ServerMain {
         
         try {
             // Shutdown components in reverse order
-            if (httpServer != null) {
-                logger.info("Shutting down HTTP server...");
-                httpServer.stop();
-            }
             
             if (tcpServer != null) {
                 logger.info("Shutting down TCP server...");
