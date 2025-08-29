@@ -1,0 +1,6 @@
+com\wifiguard\ui\DeviceTableView.class
+com\wifiguard\ui\MainUI.class
+com\wifiguard\client\ClientMain.class
+com\wifiguard\ui\DeviceTableView$Row.class
+com\wifiguard\ui\ClientApi$1.class
+com\wifiguard\ui\ClientApi.class
