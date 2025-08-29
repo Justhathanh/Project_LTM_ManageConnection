@@ -183,9 +183,7 @@ public class ClientHandler implements Runnable {
                 logger.info("Gui response: " + response.toString());
                 sendResponse(response);
                 
-                // Gui confirmation de dam bao client nhan duoc response
-                sendResponse(Response.success("RESPONSE_SENT"));
-                
+                // Khong gui confirmation nua de tranh lap
                 if (shouldQuit(inputLine, response)) {
                     logger.info("Client yeu cau thoat");
                     break;
@@ -485,8 +483,9 @@ public class ClientHandler implements Runnable {
      */
     private void sendResponse(Response response) {
         try {
-            String responseStr = response.toString();
-            logger.info("Dang gui response: " + responseStr);
+            // Su dung format response dep thay vi format cu
+            String responseStr = response.toBeautifulString();
+            logger.info("Dang gui response dep: " + responseStr);
             
             // Gui response voi retry logic don gian hon
             int retryCount = 0;
