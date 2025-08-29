@@ -1,4 +1,4 @@
-package com.wifiguard.ui;
+package com.wifiguard.client.ui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
