@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.net.ssl.*;
 import com.wifiguard.server.model.DeviceInfo;
 import com.wifiguard.server.protocol.Command;
 import com.wifiguard.server.protocol.Response;
