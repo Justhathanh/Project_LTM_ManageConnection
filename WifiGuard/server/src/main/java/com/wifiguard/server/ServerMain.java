@@ -194,8 +194,8 @@ public class ServerMain {
         // Device monitoring
         config.setProperty("monitor.pollSeconds", "5");
         config.setProperty("monitor.banSeconds", "600");
-        config.setProperty("monitor.networkScanRange", "254");
-        config.setProperty("monitor.pingTimeout", "1000");
+        config.setProperty("monitor.networkScanRange", "1000"); // Tăng từ 254 lên 1000 để quét nhiều thiết bị hơn
+        config.setProperty("monitor.pingTimeout", "500"); // Giảm timeout để quét nhanh hơn
         
         // Router integration
         config.setProperty("router.mode", "dummy");
