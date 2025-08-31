@@ -10,13 +10,19 @@
       <Pane prefWidth="18"/>
       <Label text="Host:"/><TextField fx:id="hostField" promptText="127.0.0.1" prefWidth="120"/>
              <Label text="Port:"/><TextField fx:id="portField" promptText="9099" prefWidth="70"/>
-      <CheckBox text="TLS" fx:id="tlsToggle"/>
+      <CheckBox text="TLS" fx:id="tlsToggle">
+        <tooltip>
+          <Tooltip text="Enable SSL/TLS encryption"/>
+        </tooltip>
+      </CheckBox>
       <Button text="Connect" onAction="#onConnect"/>
       <Pane prefWidth="18"/>
       <Button text="Refresh" onAction="#onRefresh"/>
       <Button text="Restart Server" onAction="#onRestartServer"/>
       <Button text="Add Allowlist" onAction="#onAdd"/>
+      <Button text="Delete" onAction="#onDel"/>
       <Pane prefWidth="18"/>
+      <Button text="Status" onAction="#onStatus"/>
       <Button text="Quit" onAction="#onQuit"/>
     </ToolBar>
   </top>
