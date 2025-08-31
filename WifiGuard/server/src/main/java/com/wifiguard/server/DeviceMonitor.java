@@ -194,19 +194,16 @@ public class DeviceMonitor {
         logger.info("==========================================");
         
         int discoveredCount = 0;
-        for (int i = 1; i <= networkScanRange; i++) {
-            String targetIp = networkPrefix + "." + i;
-            if (checkDevice(targetIp)) {
-                discoveredCount++;
-                // Add delay between device discoveries for better readability
-                try {
-                    Thread.sleep(100); // 100ms delay between devices
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-            }
-        }
+        
+        // Quét mạng chính
+        discoveredCount += scanNetworkRange(networkPrefix, 1, networkScanRange);
+        
+        // Quét thêm một số mạng con khác để tìm thiết bị
+        discoveredCount += scanNetworkRange("10.0.0", 1, 100);
+        discoveredCount += scanNetworkRange("172.16.0", 1, 100);
+        discoveredCount += scanNetworkRange("192.168.0", 1, 100);
+        discoveredCount += scanNetworkRange("192.168.2", 1, 100);
+        discoveredCount += scanNetworkRange("192.168.3", 1, 100);
         
         logger.info(""); // Empty line for separation
         logger.info("+--------------------------------------------------+");
@@ -216,6 +213,31 @@ public class DeviceMonitor {
         logger.info("| Thoi gian quet  : " + String.format("%-32s", LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"))) + " |");
         logger.info("+--------------------------------------------------+");
         logger.info(""); // Empty line for separation
+    }
+    
+    /**
+     * Scan specific network range
+     */
+    private int scanNetworkRange(String networkPrefix, int start, int end) {
+        int count = 0;
+        logger.info("Quet mang: " + networkPrefix + "." + start + " - " + networkPrefix + "." + end);
+        
+        for (int i = start; i <= end; i++) {
+            String targetIp = networkPrefix + "." + i;
+            if (checkDevice(targetIp)) {
+                count++;
+                // Giảm delay để quét nhanh hơn khi có nhiều thiết bị
+                try {
+                    Thread.sleep(30); // Giảm thêm delay để quét nhanh hơn
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }
+        
+        logger.info("Tim thay " + count + " thiet bi trong mang " + networkPrefix + ".0");
+        return count;
     }
     
     /**

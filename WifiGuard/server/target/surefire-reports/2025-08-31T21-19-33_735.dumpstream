@@ -1,0 +1,5 @@
+# Created at 2025-08-31T21:19:34.150
+Boot Manifest-JAR contains absolute paths in classpath 'D:\LapTrinhAI\Project_LTM_ManageConnection\WifiGuard\server\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+
