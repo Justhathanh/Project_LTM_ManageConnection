@@ -60,10 +60,19 @@ public class DeviceTableView {
         colKnown.setCellFactory(CheckBoxTableCell.forTableColumn(colKnown));
         statusLabel.setText("Ready to connect");
         hostField.setText("127.0.0.1"); // Localhost
-        portField.setText("9099");
+        portField.setText("9099"); // Default port for non-TLS
         
-        // Ensure TLS is unchecked by default (server doesn't support SSL)
+        // Ensure TLS is unchecked by default
         tlsToggle.setSelected(false);
+        
+        // Add listener for TLS toggle to auto-adjust port
+        tlsToggle.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                portField.setText("9443"); // TLS port
+            } else {
+                portField.setText("9099"); // Non-TLS port
+            }
+        });
         
         // Auto-start server and connect after a short delay
         javafx.application.Platform.runLater(() -> {
@@ -395,29 +404,29 @@ public class DeviceTableView {
                 try {
                     Thread.sleep(10000); // Check every 10 seconds
                     
-                    // Test connection with a simple PING command
-                    if (api != null) {
-                        try {
-                            String response = api.send("PING");
-                            if (response == null || response.isBlank()) {
-                                System.out.println("Connection test failed, attempting to reconnect...");
-                                javafx.application.Platform.runLater(() -> {
-                                    statusLabel.setText("Connection lost, reconnecting...");
-                                    reconnectToServer();
-                                });
-                            } else {
-                                System.out.println("Connection test successful: " + response);
-                            }
-                        } catch (Exception e) {
-                            System.out.println("Connection test exception: " + e.getMessage());
-                            if (isConnectionError(e)) {
-                                javafx.application.Platform.runLater(() -> {
-                                    statusLabel.setText("Connection error detected, reconnecting...");
-                                    reconnectToServer();
-                                });
-                            }
-                        }
-                    }
+                                         // Test connection with STATUS command (server supports this)
+                     if (api != null) {
+                         try {
+                             String response = api.send("STATUS");
+                             if (response == null || response.isBlank() || response.contains("ERROR")) {
+                                 System.out.println("Connection test failed, attempting to reconnect...");
+                                 javafx.application.Platform.runLater(() -> {
+                                     statusLabel.setText("Connection lost, reconnecting...");
+                                     reconnectToServer();
+                                 });
+                             } else {
+                                 System.out.println("Connection test successful: " + response);
+                             }
+                         } catch (Exception e) {
+                             System.out.println("Connection test exception: " + e.getMessage());
+                             if (isConnectionError(e)) {
+                                 javafx.application.Platform.runLater(() -> {
+                                     statusLabel.setText("Connection error detected, reconnecting...");
+                                     reconnectToServer();
+                                 });
+                             }
+                         }
+                     }
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     break;
@@ -464,9 +473,25 @@ public class DeviceTableView {
                 return;
             }
             
+            // Use TLS if selected by user
             boolean useTls = tlsToggle.isSelected();
             String host = hostField.getText().trim();
-            int port = Integer.parseInt(portField.getText().trim());
+            
+            // Auto-adjust port based on TLS selection
+            int port;
+            if (useTls) {
+                port = 9443; // Standard HTTPS port for TLS
+                if (!portField.getText().equals("9443")) {
+                    portField.setText("9443");
+                }
+            } else {
+                port = 9099; // Standard HTTP port
+                if (!portField.getText().equals("9099")) {
+                    portField.setText("9099");
+                }
+            }
+            
+            port = Integer.parseInt(portField.getText().trim());
             
             statusLabel.setText("Connecting to " + host + ":" + port + "...");
             
@@ -691,13 +716,172 @@ public class DeviceTableView {
             statusLabel.setText("Select a row to ADD"); 
             return; 
         }
+        
+        // Check if device is already in allowlist
+        if (sel.known) {
+            statusLabel.setText("Device already in allowlist: " + sel.mac);
+            return;
+        }
+        
         try {
+            statusLabel.setText("Adding device to allowlist...");
             String resp = api.send("ADD " + sel.mac);
-            statusLabel.setText(resp != null ? resp : "Added");
-            onRefresh();
+            
+                         if (resp != null && (resp.contains("success") || resp.contains("SUCCESS"))) {
+                 statusLabel.setText("Device added successfully: " + sel.mac);
+                 System.out.println("Device added to allowlist: " + sel.mac);
+                 
+                 // Refresh the device list to show updated status
+                 onRefresh();
+             } else {
+                 statusLabel.setText("Add failed: " + (resp != null ? resp : "Unknown error"));
+                 System.err.println("Add failed: " + resp);
+             }
         } catch (Exception e) {
             statusLabel.setText("Add error: " + e.getMessage());
+            System.err.println("Add error: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void onDel() {
+        Row sel = table.getSelectionModel().getSelectedItem();
+        if (api == null) { 
+            statusLabel.setText("Please Connect first"); 
+            return; 
+        }
+        if (sel == null) { 
+            statusLabel.setText("Select a row to DELETE"); 
+            return; 
+        }
+        
+        // Confirm deletion
+        String confirmMessage = "Are you sure you want to delete device:\n" +
+                              "MAC: " + sel.mac + "\n" +
+                              "Name: " + sel.name + "\n" +
+                              "IP: " + sel.ip;
+        
+        // Show confirmation dialog
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+            javafx.scene.control.Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Deletion");
+        alert.setHeaderText("Delete Device from Allowlist");
+        alert.setContentText(confirmMessage);
+        
+        alert.showAndWait().ifPresent(response -> {
+            if (response == javafx.scene.control.ButtonType.OK) {
+                // User confirmed deletion
+                try {
+                    statusLabel.setText("Deleting device...");
+                    String resp = api.send("DEL " + sel.mac);
+                    
+                                         if (resp != null && (resp.contains("success") || resp.contains("SUCCESS"))) {
+                         statusLabel.setText("Device deleted successfully: " + sel.mac);
+                         System.out.println("Device deleted: " + sel.mac);
+                         
+                         // Refresh the device list to show updated status
+                         onRefresh();
+                     } else {
+                         statusLabel.setText("Delete failed: " + (resp != null ? resp : "Unknown error"));
+                         System.err.println("Delete failed: " + resp);
+                     }
+                } catch (Exception e) {
+                    statusLabel.setText("Delete error: " + e.getMessage());
+                    System.err.println("Delete error: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @FXML
+    private void onStatus() {
+        if (api == null) { 
+            statusLabel.setText("Please Connect first"); 
+            return; 
+        }
+        try {
+            statusLabel.setText("Checking server status...");
+            String resp = api.send("STATUS");
+            
+            if (resp != null && !resp.trim().isEmpty()) {
+                // Parse and display status information
+                String statusText = "Server Status: " + resp;
+                statusLabel.setText(statusText);
+                System.out.println("Server Status: " + resp);
+                
+                // Show detailed status in a dialog
+                showStatusDialog(resp);
+            } else {
+                statusLabel.setText("Server Status: No response");
+                System.err.println("Server returned empty status response");
+            }
+        } catch (Exception e) {
+            statusLabel.setText("Status error: " + e.getMessage());
+            System.err.println("Status check failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+         /**
+      * Show detailed status information in a dialog
+      */
+     private void showStatusDialog(String statusResponse) {
+         try {
+             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                 javafx.scene.control.Alert.AlertType.INFORMATION);
+             alert.setTitle("Server Status");
+             alert.setHeaderText("Current Server Information");
+             
+             // Parse status response for better display
+             String content = "Server Response:\n";
+             
+             // Check if response contains error
+             if (statusResponse.contains("ERROR")) {
+                 alert.setAlertType(javafx.scene.control.Alert.AlertType.ERROR);
+                 alert.setHeaderText("Server Error");
+                 content += "❌ " + statusResponse + "\n\n";
+             } else {
+                 content += "✅ " + statusResponse + "\n\n";
+             }
+             
+             content += "Connection Info:\n";
+             content += "- Host: " + hostField.getText() + "\n";
+             content += "- Port: " + portField.getText() + "\n";
+             content += "- TLS: " + (tlsToggle.isSelected() ? "Enabled" : "Disabled") + "\n";
+             content += "- Connected: " + (api != null ? "Yes" : "No") + "\n";
+             content += "- Server Running: " + (isServerRunning() ? "Yes" : "No");
+             
+             // Add device count info
+             content += "\nDevice Info:\n";
+             content += "- Total Devices: " + data.size() + "\n";
+             content += "- Known Devices: " + data.stream().filter(r -> r.known).count() + "\n";
+             content += "- Unknown Devices: " + data.stream().filter(r -> !r.known).count();
+             
+             alert.setContentText(content);
+             alert.showAndWait();
+             
+         } catch (Exception e) {
+             System.err.println("Error showing status dialog: " + e.getMessage());
+         }
+     }
+    
+    /**
+     * Check allowlist status for a specific device
+     */
+    private boolean isDeviceInAllowlist(String mac) {
+        if (api == null || mac == null) return false;
+        
+        try {
+            String resp = api.send("ALLOWLIST");
+            if (resp != null && resp.contains(mac)) {
+                return true;
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking allowlist: " + e.getMessage());
+        }
+        return false;
     }
 
     @FXML
