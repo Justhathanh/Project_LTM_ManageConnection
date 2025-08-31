@@ -21,10 +21,10 @@ public class Response {
     // Constants
     private static final String EMPTY_MESSAGE = "";
     private static final String DEFAULT_DATA = "";
-    private static final String FIELD_SEPARATOR = "|";
-    private static final String KEY_VALUE_SEPARATOR = ":";
-    private static final String DEVICE_SEPARATOR = ";";
-    private static final String DEVICE_FIELD_SEPARATOR = ",";
+    private static final String FIELD_SEPARATOR = " | ";
+    private static final String KEY_VALUE_SEPARATOR = ": ";
+    private static final String DEVICE_SEPARATOR = "\n  ";
+    private static final String DEVICE_FIELD_SEPARATOR = " | ";
     
     private final Status status;
     private final String message;
@@ -126,21 +126,21 @@ public class Response {
         // Message field
         if (!message.isEmpty()) {
             sb.append(FIELD_SEPARATOR).append("MESSAGE").append(KEY_VALUE_SEPARATOR)
-              .append(escapeSpecialChars(message));
+              .append(message);
         }
         
         // Data field
         if (!data.isEmpty()) {
             sb.append(FIELD_SEPARATOR).append("DATA").append(KEY_VALUE_SEPARATOR)
-              .append(escapeSpecialChars(data));
+              .append(data);
         }
         
         // Devices field
         if (!devices.isEmpty()) {
             sb.append(FIELD_SEPARATOR).append("DEVICES").append(KEY_VALUE_SEPARATOR)
               .append(devices.size());
-            sb.append(FIELD_SEPARATOR).append("DEVICE_LIST").append(KEY_VALUE_SEPARATOR)
-              .append(formatDeviceList());
+            sb.append("\nDEVICE_LIST:");
+            sb.append(formatDeviceList());
         }
         
         return sb.toString();
@@ -152,25 +152,25 @@ public class Response {
     public String getFormattedMessage() {
         StringBuilder sb = new StringBuilder();
         
-        // Status indicator
+        // Status indicator with color
         switch (status) {
             case SUCCESS:
-                sb.append("✓ ");
+                sb.append("✅ ");
                 break;
             case ERROR:
-                sb.append("✗ ");
+                sb.append("❌ ");
                 break;
             case INVALID_COMMAND:
-                sb.append("⚠ ");
+                sb.append("⚠️ ");
                 break;
             case DEVICE_NOT_FOUND:
                 sb.append("🔍 ");
                 break;
             case DEVICE_ALREADY_EXISTS:
-                sb.append("⚠ ");
+                sb.append("⚠️ ");
                 break;
             default:
-                sb.append("• ");
+                sb.append("ℹ️ ");
         }
         
         sb.append(message);
@@ -249,6 +249,128 @@ public class Response {
         
         return status.name() + KEY_VALUE_SEPARATOR + message + 
                FIELD_SEPARATOR + "Devices: " + devices.size();
+    }
+    
+    /**
+     * Get beautiful formatted response for better readability
+     */
+    public String toBeautifulString() {
+        StringBuilder sb = new StringBuilder();
+        
+        // Header with status
+        sb.append("+-- ").append(status.name()).append(" ").append(repeat("-", 50)).append("\n");
+        
+        // Message
+        if (!message.isEmpty()) {
+            sb.append("| Message: ").append(message).append("\n");
+        }
+        
+        // Data
+        if (!data.isEmpty()) {
+            sb.append("| Data: ").append(data).append("\n");
+        }
+        
+        // Devices section
+        if (!devices.isEmpty()) {
+            sb.append("| Devices: ").append(devices.size()).append(" found\n");
+            sb.append("+-- Device List ").append(repeat("-", 40)).append("\n");
+            
+            for (int i = 0; i < devices.size(); i++) {
+                DeviceInfo device = devices.get(i);
+                sb.append("| ").append(i + 1).append(". ").append(formatDeviceBeautiful(device)).append("\n");
+            }
+        }
+        
+        // Footer
+        sb.append("+").append(repeat("-", 60));
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Format individual device with beautiful layout
+     */
+    private String formatDeviceBeautiful(DeviceInfo device) {
+        StringBuilder sb = new StringBuilder();
+        
+        // MAC address (highlighted)
+        sb.append("MAC: ").append("🔗 ").append(device.getMac());
+        
+        // IP address
+        if (device.getIp() != null && !device.getIp().isEmpty()) {
+            sb.append(" | IP: ").append("🌐 ").append(device.getIp());
+        }
+        
+        // Hostname
+        if (device.getHostname() != null && !device.getHostname().isEmpty()) {
+            sb.append(" | Hostname: ").append("💻 ").append(device.getHostname());
+        }
+        
+        // Known status with emoji
+        String statusEmoji = device.isKnown() ? "✅" : "❌";
+        sb.append(" | Status: ").append(statusEmoji);
+        
+        // Last seen timestamp
+        if (device.getLastSeen() != null) {
+            sb.append(" | Last Seen: ").append("🕒 ").append(device.getLastSeen());
+        }
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Helper method to repeat a string
+     */
+    private String repeat(String str, int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+    
+    /**
+     * Get table formatted response for better readability
+     */
+    public String toTableString() {
+        if (devices.isEmpty()) {
+            return toBeautifulString();
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        
+        // Header
+        sb.append("+-- ").append(status.name()).append(" ").append(repeat("-", 50)).append("\n");
+        if (!message.isEmpty()) {
+            sb.append("| ").append(message).append("\n");
+        }
+        sb.append("+-- Device Table ").append(repeat("-", 40)).append("\n");
+        
+        // Table header
+        sb.append("| No. | MAC Address        | IP Address      | Hostname    | Status     | Last Seen\n");
+        sb.append("+-----+--------------------+-----------------+-------------+------------+-------------------\n");
+        
+        // Table rows
+        for (int i = 0; i < devices.size(); i++) {
+            DeviceInfo device = devices.get(i);
+            String statusIcon = device.isKnown() ? "KNOWN" : "UNKNOWN";
+            String lastSeen = device.getLastSeen() != null ? 
+                device.getLastSeen().toString().substring(0, 19) : "Never";
+            
+            sb.append(String.format("| %-3d | %-18s | %-15s | %-11s | %-10s | %s\n",
+                i + 1,
+                device.getMac(),
+                device.getIp() != null ? device.getIp() : "N/A",
+                device.getHostname() != null ? device.getHostname() : "N/A",
+                statusIcon,
+                lastSeen
+            ));
+        }
+        
+        // Footer
+        sb.append("+").append(repeat("-", 60));
+        
+        return sb.toString();
     }
     
     /**
@@ -365,5 +487,46 @@ public class Response {
         }
         
         return sb.toString();
+    }
+    
+    /**
+     * Get short summary for quick display
+     */
+    public String getShortSummary() {
+        if (devices.isEmpty()) {
+            return status.name() + " | " + message;
+        }
+        
+        return status.name() + " | " + message + " | " + devices.size() + " devices";
+    }
+    
+    /**
+     * Get response in different formats
+     */
+    public String getResponse(ResponseFormat format) {
+        switch (format) {
+            case COMPACT:
+                return toCompactString();
+            case BEAUTIFUL:
+                return toBeautifulString();
+            case TABLE:
+                return toTableString();
+            case JSON:
+                return toJsonString();
+            case DEFAULT:
+            default:
+                return toString();
+        }
+    }
+    
+    /**
+     * Response format options
+     */
+    public enum ResponseFormat {
+        DEFAULT,    // Standard format
+        COMPACT,    // Minimal format
+        BEAUTIFUL,  // Beautiful box format
+        TABLE,      // Table format
+        JSON        // JSON format
     }
 }

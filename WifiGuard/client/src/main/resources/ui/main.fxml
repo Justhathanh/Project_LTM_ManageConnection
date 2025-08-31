@@ -3,13 +3,13 @@
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.wifiguard.ui.DeviceTableView">
+            fx:controller="com.wifiguard.client.ui.DeviceTableView">
   <top>
     <ToolBar>
       <Label text="WifiGuard" />
       <Pane prefWidth="18"/>
       <Label text="Host:"/><TextField fx:id="hostField" promptText="127.0.0.1" prefWidth="120"/>
-      <Label text="Port:"/><TextField fx:id="portField" promptText="5000" prefWidth="70"/>
+             <Label text="Port:"/><TextField fx:id="portField" promptText="9099" prefWidth="70"/>
       <CheckBox text="TLS" fx:id="tlsToggle"/>
       <Button text="Connect" onAction="#onConnect"/>
       <Pane prefWidth="18"/>

@@ -1,10 +1,15 @@
 package com.wifiguard.client;
 
+<<<<<<< HEAD
+import javafx.application.Application;
+import com.wifiguard.client.ui.MainUI;
+=======
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
+>>>>>>> c46efca446343d38a10b872a92666af45fbf7ba1
 
 public class Clientmain {
     public static void main(String[] args) throws Exception {

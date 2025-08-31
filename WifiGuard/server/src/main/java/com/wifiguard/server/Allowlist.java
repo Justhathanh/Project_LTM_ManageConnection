@@ -29,7 +29,23 @@ public class Allowlist {
     public Allowlist() {
         this.allowedDevices = new ConcurrentHashMap<>();
         this.allowlistPath = Paths.get(ALLOWLIST_FILE);
+        // Clear allowlist on startup to start fresh
+        clearAllowlistOnStartup();
         loadAllowlist();
+    }
+    
+    /**
+     * Clear allowlist file on startup to start fresh
+     */
+    private void clearAllowlistOnStartup() {
+        try {
+            if (Files.exists(allowlistPath)) {
+                Files.delete(allowlistPath);
+                logger.info("Allowlist file cleared on startup");
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not clear allowlist file on startup", e);
+        }
     }
     
     /**
@@ -124,21 +140,39 @@ public class Allowlist {
     }
     
     /**
-     * Save allowlist to file
+     * Save allowlist to file with beautiful formatting
      */
     public void saveAllowlist() {
         try {
             List<String> lines = new ArrayList<>();
-            lines.add("# WifiGuard Allowlist - Format: MAC,HOSTNAME,IP");
-            lines.add("# Generated: " + java.time.LocalDateTime.now());
+            
+            // Header with beautiful formatting
+            lines.add("==================================================================");
+            lines.add("                    WIFIGUARD ALLOWLIST");
+            lines.add("==================================================================");
+            lines.add("# Generated: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            lines.add("# Total Devices: " + allowedDevices.size());
+            lines.add("==================================================================");
             lines.add("");
             
-            // Convert devices to lines
+            // Table header
+            lines.add("+------------------+------------------+------------------+");
+            lines.add("| MAC Address      | Hostname         | IP Address       |");
+            lines.add("+------------------+------------------+------------------+");
+            
+            // Convert devices to formatted lines
             List<String> deviceLines = allowedDevices.values().stream()
-                    .map(this::deviceToLine)
+                    .map(this::deviceToFormattedLine)
                     .collect(Collectors.toList());
             
             lines.addAll(deviceLines);
+            
+            // Table footer
+            lines.add("+------------------+------------------+------------------+");
+            lines.add("");
+            lines.add("==================================================================");
+            lines.add("End of Allowlist");
+            lines.add("==================================================================");
             
             Files.write(allowlistPath, lines);
             logger.info("Allowlist saved with " + allowedDevices.size() + " devices");
@@ -157,6 +191,50 @@ public class Allowlist {
                 device.getMac(),
                 device.getHostname(),
                 device.getIp());
+    }
+    
+    /**
+     * Convert device to formatted table line with proper alignment
+     */
+    private String deviceToFormattedLine(DeviceInfo device) {
+        return String.format("| %-16s | %-16s | %-16s |",
+                device.getMac(),
+                device.getHostname(),
+                device.getIp());
+    }
+    
+    /**
+     * Auto-add discovered device to allowlist (for new devices found during scan)
+     */
+    public boolean autoAddDiscoveredDevice(DeviceInfo device) {
+        if (device == null || !device.isValid()) {
+            logger.warning("Cannot auto-add invalid device: " + (device != null ? device.getValidationErrors() : "null"));
+            return false;
+        }
+        
+        String macKey = device.getMac().toLowerCase();
+        
+        if (allowedDevices.containsKey(macKey)) {
+            logger.fine("Device already exists in allowlist: " + device.getMac());
+            return false;
+        }
+        
+        // Create a new device instance with known=true
+        DeviceInfo allowlistDevice = device.withKnown(true);
+        allowedDevices.put(macKey, allowlistDevice);
+        
+        logger.info("Device auto-added to allowlist: " + device.toCompactString());
+        
+        // Save to file
+        try {
+            saveAllowlist();
+            return true;
+        } catch (Exception e) {
+            // Rollback on save failure
+            allowedDevices.remove(macKey);
+            logger.log(Level.SEVERE, "Failed to save allowlist after auto-adding device, rolling back", e);
+            return false;
+        }
     }
     
     /**

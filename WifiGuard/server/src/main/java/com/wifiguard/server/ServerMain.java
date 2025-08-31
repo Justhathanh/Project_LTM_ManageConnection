@@ -50,6 +50,8 @@ public class ServerMain {
             this.tcpServer = new TcpServer(config, allowlist, deviceMonitor, this);
             logger.info("TcpServer đã được khởi tạo");
             
+
+            
             // Initialize metrics
             this.activeConnections = new AtomicInteger(0);
             this.totalConnections = new AtomicLong(0);
@@ -263,6 +265,8 @@ public class ServerMain {
             tcpServer.start();
             logger.info("TCP server started");
             
+
+            
             logger.info("All components started successfully");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to start components", e);
@@ -313,6 +317,7 @@ public class ServerMain {
         
         try {
             // Shutdown components in reverse order
+            
             if (tcpServer != null) {
                 logger.info("Shutting down TCP server...");
                 tcpServer.shutdown();

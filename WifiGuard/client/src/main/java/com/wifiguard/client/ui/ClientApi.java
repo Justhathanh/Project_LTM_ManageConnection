@@ -1,9 +1,18 @@
-package com.wifiguard.ui;
+package com.wifiguard.client.ui;
+
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.security.SecureRandom;
 
 import javax.net.SocketFactory;
-import javax.net.ssl.*;
-import java.io.*;
-import java.security.SecureRandom;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class ClientApi implements Closeable {
     private final boolean useTls;
@@ -33,7 +42,26 @@ public class ClientApi implements Closeable {
         if (socket == null || socket.isClosed()) throw new IllegalStateException("Not connected");
         out.println(line);
         out.flush();
-        return in.readLine(); // server trả 1 dòng / lệnh
+        
+        // Read full response (multiple lines)
+        StringBuilder response = new StringBuilder();
+        String line2;
+        int lineCount = 0;
+        int maxLines = 50; // Prevent infinite loop
+        
+        while ((line2 = in.readLine()) != null && lineCount < maxLines) {
+            response.append(line2).append("\n");
+            lineCount++;
+            
+            // Stop if we see end markers
+            if (line2.contains("+--------------------------------------------------") || 
+                line2.contains("End of response") ||
+                line2.isEmpty()) {
+                break;
+            }
+        }
+        
+        return response.toString().trim();
     }
 
     @Override
