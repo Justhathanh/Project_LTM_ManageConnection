@@ -1,4 +1,5 @@
 package com.wifiguard.server.gateway;
+
 import java.util.Map;
 public class DummyRouterGateway implements RouterGateway {
   @Override public Map<String,Device> getConnectedDevices() {

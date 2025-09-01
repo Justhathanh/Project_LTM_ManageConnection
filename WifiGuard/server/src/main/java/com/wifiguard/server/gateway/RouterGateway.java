@@ -5,3 +5,4 @@ public interface RouterGateway {
   default void block(String mac,int banSeconds) throws Exception {}
   record Device(String mac,int rssi,int txRateMbps){}
 }
+
