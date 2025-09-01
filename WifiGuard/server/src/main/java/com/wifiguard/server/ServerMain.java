@@ -1,5 +1,4 @@
 package com.wifiguard.server;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -21,6 +20,7 @@ public class ServerMain {
     private final Allowlist allowlist;
     private final DeviceMonitor deviceMonitor;
     private final TcpServer tcpServer;
+    private final TlsServer tlsServer; // Thêm TlsServer
     
     // Performance metrics
     private final AtomicInteger activeConnections;
@@ -50,6 +50,24 @@ public class ServerMain {
             
             this.tcpServer = new TcpServer(config, allowlist, deviceMonitor, this);
             logger.info("TcpServer đã được khởi tạo");
+            
+            // Khởi tạo TlsServer nếu TLS được bật
+            if (isTlsEnabled()) {
+                try {
+                    ServerConfig serverConfig = new ServerConfig();
+                    // Cập nhật props trong ServerConfig với config từ ServerMain
+                    serverConfig.props.putAll(this.config);
+                    SecurityConfig securityConfig = new SecurityConfig(serverConfig);
+                    this.tlsServer = new TlsServer(getTlsPort(), securityConfig, deviceMonitor, allowlist);
+                    logger.info("TlsServer đã được khởi tạo");
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Không thể khởi tạo TlsServer", e);
+                    throw new RuntimeException("TLS initialization failed", e);
+                }
+            } else {
+                this.tlsServer = null;
+                logger.info("TLS không được bật");
+            }
             
             // Initialize metrics
             this.activeConnections = new AtomicInteger(0);
@@ -193,8 +211,8 @@ public class ServerMain {
         // Device monitoring
         config.setProperty("monitor.pollSeconds", "5");
         config.setProperty("monitor.banSeconds", "600");
-        config.setProperty("monitor.networkScanRange", "254");
-        config.setProperty("monitor.pingTimeout", "1000");
+        config.setProperty("monitor.networkScanRange", "1000"); // Tăng từ 254 lên 1000 để quét nhiều thiết bị hơn
+        config.setProperty("monitor.pingTimeout", "500"); // Giảm timeout để quét nhanh hơn
         
         // Router integration
         config.setProperty("router.mode", "dummy");
@@ -264,6 +282,12 @@ public class ServerMain {
             tcpServer.start();
             logger.info("TCP server started");
             
+            // Start TlsServer nếu được khởi tạo
+            if (tlsServer != null) {
+                logger.info("TLS server started on port " + getTlsPort());
+                tlsServer.start();
+            }
+            
             logger.info("All components started successfully");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to start components", e);
@@ -314,9 +338,15 @@ public class ServerMain {
         
         try {
             // Shutdown components in reverse order
+            
             if (tcpServer != null) {
                 logger.info("Shutting down TCP server...");
                 tcpServer.shutdown();
+            }
+            
+            if (tlsServer != null) {
+                logger.info("Shutting down TLS server...");
+                tlsServer.shutdown();
             }
             
             if (deviceMonitor != null) {
@@ -391,6 +421,10 @@ public class ServerMain {
     private String getRouterMode() {
         return config.getProperty("router.mode", "dummy");
     }
+
+    private int getTlsPort() {
+        return Integer.parseInt(config.getProperty("tls.port", "443")); // Mặc định là 443
+    }
     
     // Component getters
     public Allowlist getAllowlist() {
@@ -403,6 +437,10 @@ public class ServerMain {
     
     public TcpServer getTcpServer() {
         return tcpServer;
+    }
+
+    public TlsServer getTlsServer() {
+        return tlsServer;
     }
     
     // Server state getters

@@ -1,0 +1,5 @@
+com\wifiguard\server\SimpleResponseTest.class
+TestClient.class
+SimpleTestClient.class
+com\wifiguard\server\SimpleTestClient.class
+com\wifiguard\server\SimpleClient.class

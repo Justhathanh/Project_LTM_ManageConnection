@@ -1,15 +1,8 @@
 package com.wifiguard.server.gateway;
-
-import com.wifiguard.server.model.*;
-
-import java.util.List;
-
-public interface RouterGateway{
- 
-    List<DeviceInfo> ScanDevices();
-
-    void refresh();
-
-    boolean isAvailable();
-
+import java.util.Map;
+public interface RouterGateway {
+  Map<String,Device> getConnectedDevices() throws Exception;
+  default void block(String mac,int banSeconds) throws Exception {}
+  record Device(String mac,int rssi,int txRateMbps){}
 }
+

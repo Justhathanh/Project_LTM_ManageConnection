@@ -1,0 +1,132 @@
+Aug 29, 2025 9:49:55 PM com.wifiguard.server.ServerMain <init>
+INFO: Ðang kh?i t?o ServerMain...
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain loadConfiguration
+INFO: Configuration loaded from server.properties
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain <init>
+INFO: Configuration ð? ðý?c load
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.Allowlist loadFromFile
+INFO: Allowlist loaded: 1 devices, 0 skipped, 0 errors
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain <init>
+INFO: Allowlist ð? ðý?c kh?i t?o
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.DeviceMonitor <init>
+INFO: DeviceMonitor initialized with poll interval: 5s, ban: 600s, mode: dummy, scan range: 254, ping timeout: 1000ms
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain <init>
+INFO: DeviceMonitor ð? ðý?c kh?i t?o
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain <init>
+INFO: TcpServer ð? ðý?c kh?i t?o
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain <init>
+INFO: ServerMain kh?i t?o thành công
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain start
+INFO: Starting WifiGuard Server...
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain setupLogging
+INFO: Logging initialized
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain logConfiguration
+INFO: === Server Configuration ===
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain logConfiguration
+INFO: Server Host: 0.0.0.0
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain logConfiguration
+INFO: Server Port: 9099
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain logConfiguration
+INFO: Server Backlog: 50
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain logConfiguration
+INFO: TLS Enabled: false
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain logConfiguration
+INFO: Thread Pool Size: 20
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain logConfiguration
+INFO: Poll Interval: 5 seconds
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain logConfiguration
+INFO: Router Mode: dummy
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain logConfiguration
+INFO: =============================
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain validateConfiguration
+INFO: Configuration validation passed
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.Allowlist loadFromFile
+INFO: Allowlist loaded: 1 devices, 0 skipped, 0 errors
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain initializeComponents
+INFO: Allowlist initialized with 1 devices
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain initializeComponents
+INFO: Device monitor initialized
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain initializeComponents
+INFO: All components initialized successfully
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.DeviceMonitor start
+INFO: DeviceMonitor started
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain startComponents
+INFO: Device monitor started
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.TcpServer start
+SEVERE: Failed to start server on 0.0.0.0:9099
+java.net.BindException: Address already in use: bind
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:511)
+	at java.base/sun.nio.ch.Net.bind(Net.java:500)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:630)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:326)
+	at com.wifiguard.server.TcpServer.createRegularServerSocket(TcpServer.java:156)
+	at com.wifiguard.server.TcpServer.createServerSocket(TcpServer.java:122)
+	at com.wifiguard.server.TcpServer.start(TcpServer.java:101)
+	at com.wifiguard.server.ServerMain.startComponents(ServerMain.java:264)
+	at com.wifiguard.server.ServerMain.start(ServerMain.java:99)
+	at com.wifiguard.server.ServerMain.main(ServerMain.java:75)
+
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain startComponents
+SEVERE: Failed to start components
+java.lang.RuntimeException: Failed to start server
+	at com.wifiguard.server.TcpServer.start(TcpServer.java:111)
+	at com.wifiguard.server.ServerMain.startComponents(ServerMain.java:264)
+	at com.wifiguard.server.ServerMain.start(ServerMain.java:99)
+	at com.wifiguard.server.ServerMain.main(ServerMain.java:75)
+Caused by: java.net.BindException: Address already in use: bind
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:511)
+	at java.base/sun.nio.ch.Net.bind(Net.java:500)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:630)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:326)
+	at com.wifiguard.server.TcpServer.createRegularServerSocket(TcpServer.java:156)
+	at com.wifiguard.server.TcpServer.createServerSocket(TcpServer.java:122)
+	at com.wifiguard.server.TcpServer.start(TcpServer.java:101)
+	... 3 more
+
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain start
+SEVERE: Failed to start server
+java.lang.RuntimeException: Component startup failed
+	at com.wifiguard.server.ServerMain.startComponents(ServerMain.java:270)
+	at com.wifiguard.server.ServerMain.start(ServerMain.java:99)
+	at com.wifiguard.server.ServerMain.main(ServerMain.java:75)
+Caused by: java.lang.RuntimeException: Failed to start server
+	at com.wifiguard.server.TcpServer.start(TcpServer.java:111)
+	at com.wifiguard.server.ServerMain.startComponents(ServerMain.java:264)
+	... 2 more
+Caused by: java.net.BindException: Address already in use: bind
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:511)
+	at java.base/sun.nio.ch.Net.bind(Net.java:500)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:630)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:326)
+	at com.wifiguard.server.TcpServer.createRegularServerSocket(TcpServer.java:156)
+	at com.wifiguard.server.TcpServer.createServerSocket(TcpServer.java:122)
+	at com.wifiguard.server.TcpServer.start(TcpServer.java:101)
+	... 3 more
+
+Aug 29, 2025 9:49:56 PM com.wifiguard.server.ServerMain main
+SEVERE: Failed to start server
+java.lang.RuntimeException: Server startup failed
+	at com.wifiguard.server.ServerMain.start(ServerMain.java:108)
+	at com.wifiguard.server.ServerMain.main(ServerMain.java:75)
+Caused by: java.lang.RuntimeException: Component startup failed
+	at com.wifiguard.server.ServerMain.startComponents(ServerMain.java:270)
+	at com.wifiguard.server.ServerMain.start(ServerMain.java:99)
+	... 1 more
+Caused by: java.lang.RuntimeException: Failed to start server
+	at com.wifiguard.server.TcpServer.start(TcpServer.java:111)
+	at com.wifiguard.server.ServerMain.startComponents(ServerMain.java:264)
+	... 2 more
+Caused by: java.net.BindException: Address already in use: bind
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:511)
+	at java.base/sun.nio.ch.Net.bind(Net.java:500)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:630)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:326)
+	at com.wifiguard.server.TcpServer.createRegularServerSocket(TcpServer.java:156)
+	at com.wifiguard.server.TcpServer.createServerSocket(TcpServer.java:122)
+	at com.wifiguard.server.TcpServer.start(TcpServer.java:101)
+	... 3 more
+
