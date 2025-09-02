@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.net.ssl.*;
+
 import com.wifiguard.server.model.DeviceInfo;
 import com.wifiguard.server.protocol.Command;
 import com.wifiguard.server.protocol.Response;
@@ -483,9 +483,9 @@ public class ClientHandler implements Runnable {
      */
     private void sendResponse(Response response) {
         try {
-            // Su dung format response dep thay vi format cu
-            String responseStr = response.toBeautifulString();
-            logger.info("Dang gui response dep: " + responseStr);
+            // Su dung format don gian de client co the doc duoc
+            String responseStr = response.getShortSummary();
+            logger.info("Dang gui response don gian: " + responseStr);
             
             // Gui response voi retry logic don gian hon
             int retryCount = 0;

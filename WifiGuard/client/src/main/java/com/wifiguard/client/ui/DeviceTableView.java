@@ -727,16 +727,19 @@ public class DeviceTableView {
             statusLabel.setText("Adding device to allowlist...");
             String resp = api.send("ADD " + sel.mac);
             
-                         if (resp != null && (resp.contains("success") || resp.contains("SUCCESS"))) {
-                 statusLabel.setText("Device added successfully: " + sel.mac);
-                 System.out.println("Device added to allowlist: " + sel.mac);
-                 
-                 // Refresh the device list to show updated status
-                 onRefresh();
-             } else {
-                 statusLabel.setText("Add failed: " + (resp != null ? resp : "Unknown error"));
-                 System.err.println("Add failed: " + resp);
-             }
+            System.out.println("ADD response: " + resp);
+            
+            if (resp != null && (resp.contains("success") || resp.contains("SUCCESS") || 
+                resp.contains("thanh cong") || resp.contains("them thanh cong"))) {
+                statusLabel.setText("Device added successfully: " + sel.mac);
+                System.out.println("Device added to allowlist: " + sel.mac);
+                
+                // Refresh the device list to show updated status
+                onRefresh();
+            } else {
+                statusLabel.setText("Add failed: " + (resp != null ? resp : "Unknown error"));
+                System.err.println("Add failed: " + resp);
+            }
         } catch (Exception e) {
             statusLabel.setText("Add error: " + e.getMessage());
             System.err.println("Add error: " + e.getMessage());
@@ -776,16 +779,19 @@ public class DeviceTableView {
                     statusLabel.setText("Deleting device...");
                     String resp = api.send("DEL " + sel.mac);
                     
-                                         if (resp != null && (resp.contains("success") || resp.contains("SUCCESS"))) {
-                         statusLabel.setText("Device deleted successfully: " + sel.mac);
-                         System.out.println("Device deleted: " + sel.mac);
-                         
-                         // Refresh the device list to show updated status
-                         onRefresh();
-                     } else {
-                         statusLabel.setText("Delete failed: " + (resp != null ? resp : "Unknown error"));
-                         System.err.println("Delete failed: " + resp);
-                     }
+                    System.out.println("DELETE response: " + resp);
+                    
+                    if (resp != null && (resp.contains("success") || resp.contains("SUCCESS") || 
+                        resp.contains("thanh cong") || resp.contains("xoa thanh cong"))) {
+                        statusLabel.setText("Device deleted successfully: " + sel.mac);
+                        System.out.println("Device deleted: " + sel.mac);
+                        
+                        // Refresh the device list to show updated status
+                        onRefresh();
+                    } else {
+                        statusLabel.setText("Delete failed: " + (resp != null ? resp : "Unknown error"));
+                        System.err.println("Delete failed: " + resp);
+                    }
                 } catch (Exception e) {
                     statusLabel.setText("Delete error: " + e.getMessage());
                     System.err.println("Delete error: " + e.getMessage());
