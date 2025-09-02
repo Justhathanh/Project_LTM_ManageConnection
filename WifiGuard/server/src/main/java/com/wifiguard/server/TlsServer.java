@@ -32,6 +32,11 @@ public class TlsServer {
         logger.info("TLS Server initialized on port " + port);
     }
     
+    // Thêm constructor mới để khớp với cách gọi từ ServerMain
+    public TlsServer(int port, SecurityConfig sec, DeviceMonitor monitor, Allowlist allow, ServerMain serverMain) throws Exception {
+        this(port, sec, monitor, allow); // Gọi constructor chính
+    }
+    
     public void start() throws Exception {
         if (running.get()) {
             logger.warning("TLS Server is already running");

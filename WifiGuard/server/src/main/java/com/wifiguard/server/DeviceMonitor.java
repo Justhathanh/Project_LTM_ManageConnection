@@ -24,6 +24,7 @@ public class DeviceMonitor {
     private static final Logger logger = Logger.getLogger(DeviceMonitor.class.getName());
     private static final String OPENWRT_MODE = "openwrt";
     private static final String DUMMY_MODE = "dummy";
+    private static final String WINDOWS_ARP_MODE = "windowsarp";
     
     private final Allowlist allowlist;
     private final Map<String, DeviceInfo> discoveredDevices;
@@ -112,6 +113,8 @@ public class DeviceMonitor {
         try {
             if (OPENWRT_MODE.equals(routerMode)) {
                 pollFromOpenWrt();
+            } else if (WINDOWS_ARP_MODE.equals(routerMode)) {
+                pollFromWindowsArp();
             } else {
                 pollFromDummy();
             }
@@ -135,6 +138,58 @@ public class DeviceMonitor {
             logger.fine("OpenWrt polling not fully implemented yet");
         } catch (Exception e) {
             logger.log(Level.WARNING, "Error polling from OpenWrt router", e);
+        }
+    }
+    
+    /**
+     * Poll from Windows ARP mode
+     */
+    private void pollFromWindowsArp() {
+        try {
+            logger.info("Polling from Windows ARP mode");
+            
+            // Tạo WindowsArpGateway instance mới mỗi lần poll
+            com.wifiguard.server.gateway.WindowsArpGateway gateway = new com.wifiguard.server.gateway.WindowsArpGateway();
+            
+            // Sử dụng method scanDevices để lấy danh sách thiết bị
+            List<com.wifiguard.server.model.DeviceInfo> newDevices = gateway.scanDevices();
+            
+            logger.info("Windows ARP scan found " + newDevices.size() + " devices");
+            
+            for (com.wifiguard.server.model.DeviceInfo device : newDevices) {
+                String macKey = device.getMac().toLowerCase();
+                
+                // Update existing device or add new one
+                DeviceInfo existingDevice = discoveredDevices.get(macKey);
+                if (existingDevice != null) {
+                    // Create updated device instance
+                    DeviceInfo updatedDevice = existingDevice
+                            .updateLastSeen()
+                            .withKnown(allowlist.isAllowed(device.getMac()));
+                    discoveredDevices.put(macKey, updatedDevice);
+                    logger.info("Updated existing device: " + device.getMac() + " at " + device.getIp() + " (" + device.getHostname() + ")");
+                } else {
+                    discoveredDevices.put(macKey, device);
+                    
+                    // Auto-add new device to allowlist
+                    boolean addedToAllowlist = allowlist.autoAddDiscoveredDevice(device);
+                    String statusText = addedToAllowlist ? "DA BIET [AUTO-ADDED]" : "CHUA BIET [NEW]";
+                    
+                    logger.info(""); // Empty line before device info
+                    logger.info("+--------------------------------------------------+");
+                    logger.info("|                THIET BI MOI                     |");
+                    logger.info("+--------------------------------------------------+");
+                    logger.info("| IP Address    : " + String.format("%-32s", device.getIp()) + " |");
+                    logger.info("| MAC Address   : " + String.format("%-32s", device.getMac()) + " |");
+                    logger.info("| Ten Thiet Bi  : " + String.format("%-32s", device.getHostname()) + " |");
+                    logger.info("| Trang Thai    : " + String.format("%-32s", statusText) + " |");
+                    logger.info("| Thoi Gian     : " + String.format("%-32s", LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"))) + " |");
+                    logger.info("+--------------------------------------------------+");
+                    logger.info(""); // Empty line after device info
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error in Windows ARP mode polling", e);
         }
     }
     

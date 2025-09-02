@@ -58,7 +58,7 @@ public class ServerMain {
                     // Cập nhật props trong ServerConfig với config từ ServerMain
                     serverConfig.props.putAll(this.config);
                     SecurityConfig securityConfig = new SecurityConfig(serverConfig);
-                    this.tlsServer = new TlsServer(getTlsPort(), securityConfig, deviceMonitor, allowlist);
+                    this.tlsServer = new TlsServer(getTlsPort(), securityConfig, deviceMonitor, allowlist, this);
                     logger.info("TlsServer đã được khởi tạo");
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, "Không thể khởi tạo TlsServer", e);
@@ -215,7 +215,7 @@ public class ServerMain {
         config.setProperty("monitor.pingTimeout", "500"); // Giảm timeout để quét nhanh hơn
         
         // Router integration
-        config.setProperty("router.mode", "dummy");
+        config.setProperty("router.mode", "windowsarp");
         config.setProperty("router.openwrt.host", "192.168.1.1");
         config.setProperty("router.openwrt.username", "admin");
         config.setProperty("router.openwrt.password", "");
