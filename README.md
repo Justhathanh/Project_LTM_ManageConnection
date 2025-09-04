@@ -41,12 +41,12 @@ WifiGuard/
 
 ## Nhánh (branch) & phân công
 
-| Branch                 | Người phụ trách | Phạm vi                                                                  | Điểm hoàn thành                                                 |
-| ---------------------- | --------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------- |
-| `feature/core-server`  | A               | `ServerMain`, `DeviceMonitor`, `Allowlist`, `ClientHandler`, `TcpServer` | Lệnh `LIST/ADD/DEL/STATUS/QUIT`; emit `EVENT CONNECTED/UNKNOWN` |
-| `feature/gateway`      | B               | `RouterGateway`, `WindowsArpGateway`, mock `DummyRouterGateway`          | `getConnectedDevices()` từ `arp -a`, lọc gateway/broadcast      |
-| `feature/tls-security` | C               | `SecurityConfig`, `TlsServer`, cập nhật `ServerMain`, `ClientMain`       | Bật TLS; Wireshark chỉ thấy TLS handshake + encrypted data      |
-| `feature/client-cli`   | D               | `ClientMain`, `notify/ConsoleNotifier`                                   | CLI realtime, highlight UNKNOWN, thao tác nhanh `ADD`           |
+| Branch                 | Người phụ trách     | Phạm vi                                                                  | Điểm hoàn thành                                                 |
+| ---------------------- | ------------------  | ------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| `feature/core-server`  | Nguyễn Hoàng Phương | `ServerMain`, `DeviceMonitor`, `Allowlist`, `ClientHandler`, `TcpServer` | Lệnh `LIST/ADD/DEL/STATUS/QUIT`; emit `EVENT CONNECTED/UNKNOWN` |
+| `feature/gateway`      | Trần Văn Hùng       | `RouterGateway`, `WindowsArpGateway`, mock `DummyRouterGateway`          | `getConnectedDevices()` từ `arp -a`, lọc gateway/broadcast      |
+| `feature/tls-security` | Hà Văn Thành        | `SecurityConfig`, `TlsServer`, cập nhật `ServerMain`, `ClientMain`       | Bật TLS; Wireshark chỉ thấy TLS handshake + encrypted data      |
+| `feature/client-cli`   | Nguyễn Lê Tuấn      | `ClientMain`, `notify/ConsoleNotifier`                                   | CLI realtime, highlight UNKNOWN, thao tác nhanh `ADD`           |
 
 ### Tạo branch
 
